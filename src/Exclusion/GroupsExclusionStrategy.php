@@ -24,7 +24,7 @@ use JMS\Serializer\Metadata\PropertyMetadata;
 
 class GroupsExclusionStrategy implements ExclusionStrategyInterface
 {
-    const DEFAULT_GROUP = 'Default';
+    public const DEFAULT_GROUP = 'Default';
 
     private $groups = array();
 

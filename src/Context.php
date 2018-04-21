@@ -175,6 +175,11 @@ abstract class Context
         return $this;
     }
 
+    public function getGroups() : array
+    {
+        return $this->attributes['groups'] ?? [GroupsExclusionStrategy::DEFAULT_GROUP];
+    }
+
     public function enableMaxDepthChecks(): self
     {
         $this->addExclusionStrategy(new DepthExclusionStrategy());
