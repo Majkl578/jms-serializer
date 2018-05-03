@@ -8,13 +8,14 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ODM\PHPCR\Configuration;
 use Doctrine\ODM\PHPCR\DocumentManager;
 use Doctrine\ODM\PHPCR\Mapping\Driver\AnnotationDriver as DoctrinePHPCRDriver;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\Driver\AnnotationDriver;
 use JMS\Serializer\Metadata\Driver\DoctrinePHPCRTypeDriver;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 
 class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
 {
-    public function getMetadata()
+    public function getMetadata() : ClassMetadataInterface
     {
         $refClass = new \ReflectionClass('JMS\Serializer\Tests\Fixtures\DoctrinePHPCR\BlogPost');
         $metadata = $this->getDoctrinePHPCRDriver()->loadMetadataForClass($refClass);
@@ -27,7 +28,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
         $metadata = $this->getMetadata();
         self::assertEquals(
             ['name' => 'DateTime', 'params' => []],
-            $metadata->propertyMetadata['createdAt']->type
+            $metadata->getProperties()['createdAt']->type
         );
     }
 
@@ -36,7 +37,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
         $metadata = $this->getMetadata();
         self::assertEquals(
             ['name' => 'JMS\Serializer\Tests\Fixtures\DoctrinePHPCR\Author', 'params' => []],
-            $metadata->propertyMetadata['author']->type
+            $metadata->getProperties()['author']->type
         );
     }
 
@@ -48,7 +49,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
             ['name' => 'ArrayCollection', 'params' => [
                 ['name' => 'JMS\Serializer\Tests\Fixtures\DoctrinePHPCR\Comment', 'params' => []]]
             ],
-            $metadata->propertyMetadata['comments']->type
+            $metadata->getProperties()['comments']->type
         );
     }
 
@@ -59,7 +60,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
         // This would be guessed as boolean but we've overridden it to integer
         self::assertEquals(
             ['name' => 'integer', 'params' => []],
-            $metadata->propertyMetadata['published']->type
+            $metadata->getProperties()['published']->type
         );
     }
 

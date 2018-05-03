@@ -6,7 +6,7 @@ namespace JMS\Serializer;
 
 use JMS\Serializer\Exception\LogicException;
 use JMS\Serializer\Exception\RuntimeException;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 
@@ -90,20 +90,20 @@ final class JsonDeserializationVisitor extends AbstractVisitor implements Deseri
         }
     }
 
-    public function visitDiscriminatorMapProperty($data, ClassMetadata $metadata): string
+    public function visitDiscriminatorMapProperty($data, ClassMetadataInterface $metadata): string
     {
-        if (isset($data[$metadata->discriminatorFieldName])) {
-            return (string)$data[$metadata->discriminatorFieldName];
+        if (isset($data[$metadata->getDiscriminatorFieldName()])) {
+            return (string)$data[$metadata->getDiscriminatorFieldName()];
         }
 
         throw new LogicException(sprintf(
             'The discriminator field name "%s" for base-class "%s" was not found in input data.',
-            $metadata->discriminatorFieldName,
-            $metadata->name
+            $metadata->getDiscriminatorFieldName(),
+            $metadata->getName()
         ));
     }
 
-    public function startVisitingObject(ClassMetadata $metadata, object $object, array $type): void
+    public function startVisitingObject(ClassMetadataInterface $metadata, object $object, array $type): void
     {
         $this->setCurrentObject($object);
     }
@@ -133,7 +133,7 @@ final class JsonDeserializationVisitor extends AbstractVisitor implements Deseri
         return $v;
     }
 
-    public function endVisitingObject(ClassMetadata $metadata, $data, array $type): object
+    public function endVisitingObject(ClassMetadataInterface $metadata, $data, array $type): object
     {
         $obj = $this->currentObject;
         $this->revertCurrentObject();

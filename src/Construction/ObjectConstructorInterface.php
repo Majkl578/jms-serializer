@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Construction;
 
 use JMS\Serializer\DeserializationContext;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 
 /**
@@ -22,12 +22,12 @@ interface ObjectConstructorInterface
      * "unserialize" techniques, reflection, or other means.
      *
      * @param DeserializationVisitorInterface $visitor
-     * @param ClassMetadata $metadata
-     * @param mixed $data
-     * @param array $type ["name" => string, "params" => array]
-     * @param DeserializationContext $context
+     * @param ClassMetadataInterface          $metadata
+     * @param mixed                           $data
+     * @param array                           $type ["name" => string, "params" => array]
+     * @param DeserializationContext          $context
      *
      * @return object
      */
-    public function construct(DeserializationVisitorInterface $visitor, ClassMetadata $metadata, $data, array $type, DeserializationContext $context): ?object;
+    public function construct(DeserializationVisitorInterface $visitor, ClassMetadataInterface $metadata, $data, array $type, DeserializationContext $context): ?object;
 }

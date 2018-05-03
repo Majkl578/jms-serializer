@@ -20,7 +20,7 @@ use JMS\Serializer\Expression\ExpressionEvaluatorInterface;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\NullAwareVisitorInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
@@ -186,11 +186,11 @@ final class SerializationGraphNavigator extends GraphNavigator implements GraphN
                     return $rs;
                 }
 
-                /** @var $metadata ClassMetadata */
+                /** @var $metadata ClassMetadataInterface */
                 $metadata = $this->metadataFactory->getMetadataForClass($type['name']);
 
-                if ($metadata->usingExpression && $this->expressionExclusionStrategy === null) {
-                    throw new ExpressionLanguageRequiredException("To use conditional exclude/expose in {$metadata->name} you must configure the expression language.");
+                if ($metadata->getUsingExpression() && $this->expressionExclusionStrategy === null) {
+                    throw new ExpressionLanguageRequiredException("To use conditional exclude/expose in {$metadata->getName()} you must configure the expression language.");
                 }
 
                 if ($this->exclusionStrategy->shouldSkipClass($metadata, $this->context)) {
@@ -201,12 +201,12 @@ final class SerializationGraphNavigator extends GraphNavigator implements GraphN
 
                 $this->context->pushClassMetadata($metadata);
 
-                foreach ($metadata->preSerializeMethods as $method) {
+                foreach ($metadata->getPreSerializeMethods() as $method) {
                     $method->invoke($data);
                 }
 
                 $this->visitor->startVisitingObject($metadata, $data, $type);
-                foreach ($metadata->propertyMetadata as $propertyMetadata) {
+                foreach ($metadata->getProperties() as $propertyMetadata) {
                     if ($this->exclusionStrategy->shouldSkipProperty($propertyMetadata, $this->context)) {
                         continue;
                     }
@@ -232,17 +232,17 @@ final class SerializationGraphNavigator extends GraphNavigator implements GraphN
         }
     }
 
-    private function afterVisitingObject(ClassMetadata $metadata, $object, array $type)
+    private function afterVisitingObject(ClassMetadataInterface $metadata, $object, array $type)
     {
         $this->context->stopVisiting($object);
         $this->context->popClassMetadata();
 
-        foreach ($metadata->postSerializeMethods as $method) {
+        foreach ($metadata->getPostSerializeMethods() as $method) {
             $method->invoke($object);
         }
 
-        if ($this->dispatcher->hasListeners('serializer.post_serialize', $metadata->name, $this->format)) {
-            $this->dispatcher->dispatch('serializer.post_serialize', $metadata->name, $this->format, new ObjectEvent($this->context, $object, $type));
+        if ($this->dispatcher->hasListeners('serializer.post_serialize', $metadata->getName(), $this->format)) {
+            $this->dispatcher->dispatch('serializer.post_serialize', $metadata->getName(), $this->format, new ObjectEvent($this->context, $object, $type));
         }
     }
 }

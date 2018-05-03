@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Metadata\Driver;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as DoctrineClassMetadata;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
@@ -14,9 +14,9 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class DoctrineTypeDriver extends AbstractDoctrineTypeDriver
 {
-    protected function setDiscriminator(DoctrineClassMetadata $doctrineMetadata, ClassMetadata $classMetadata):void
+    protected function setDiscriminator(DoctrineClassMetadata $doctrineMetadata, ClassMetadataInterface $classMetadata):void
     {
-        if (empty($classMetadata->discriminatorMap) && !$classMetadata->discriminatorDisabled
+        if (empty($classMetadata->getDiscriminatorMap()) && !$classMetadata->gesDiscriminatorDisabled()
             && !empty($doctrineMetadata->discriminatorMap) && $doctrineMetadata->isRootEntity()
         ) {
             $classMetadata->setDiscriminator(

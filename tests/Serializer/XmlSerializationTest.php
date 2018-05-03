@@ -10,6 +10,7 @@ use JMS\Serializer\Exception\InvalidArgumentException;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\DateHandler;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
@@ -410,11 +411,13 @@ class XmlSerializationTest extends BaseSerializationTest
         $this->handlerRegistry->registerHandler(GraphNavigatorInterface::DIRECTION_SERIALIZATION, 'ObjectWithXmlNamespacesAndObjectPropertyAuthorVirtual', $this->getFormat(),
             function (XmlSerializationVisitor $visitor, $data, $type, Context $context) use ($author) {
                 $factory = $context->getMetadataFactory(get_class($author));
+
+                /** @var ClassMetadataInterface $classMetadata */
                 $classMetadata = $factory->getMetadataForClass(get_class($author));
 
                 $metadata = new StaticPropertyMetadata(get_class($author), 'foo', $author);
-                $metadata->xmlNamespace = $classMetadata->xmlRootNamespace;
-                $metadata->xmlNamespace = $classMetadata->xmlRootNamespace;
+                $metadata->xmlNamespace = $classMetadata->getXmlRootNamespace();
+                $metadata->xmlNamespace = $classMetadata->getXmlRootNamespace();
 
                 $visitor->visitProperty($metadata, $author);
             }

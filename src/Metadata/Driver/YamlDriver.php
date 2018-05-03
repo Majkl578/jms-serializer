@@ -7,6 +7,7 @@ namespace JMS\Serializer\Metadata\Driver;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Exception\InvalidMetadataException;
 use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Metadata\VirtualPropertyMetadata;
@@ -275,7 +276,7 @@ class YamlDriver extends AbstractFileDriver
         return 'yml';
     }
 
-    private function addClassProperties(ClassMetadata $metadata, array $config)
+    private function addClassProperties(ClassMetadataInterface $metadata, array $config)
     {
         if (isset($config['custom_accessor_order']) && !isset($config['accessor_order'])) {
             $config['accessor_order'] = 'custom';

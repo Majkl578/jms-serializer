@@ -6,7 +6,7 @@ namespace JMS\Serializer;
 
 use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 
@@ -63,12 +63,12 @@ final class XmlSerializationVisitor extends AbstractVisitor implements Serializa
         return $document;
     }
 
-    public function createRoot(ClassMetadata $metadata = null, ?string $rootName = null, ?string $rootNamespace = null, ?string $rootPrefix = null)
+    public function createRoot(ClassMetadataInterface $metadata = null, ?string $rootName = null, ?string $rootNamespace = null, ?string $rootPrefix = null)
     {
-        if ($metadata !== null && !empty($metadata->xmlRootName)) {
-            $rootPrefix = $metadata->xmlRootPrefix;
-            $rootName = $metadata->xmlRootName;
-            $rootNamespace = $metadata->xmlRootNamespace ?: $this->getClassDefaultNamespace($metadata);
+        if ($metadata !== null && !empty($metadata->getXmlRootName())) {
+            $rootPrefix = $metadata->getXmlRootPrefix();
+            $rootName = $metadata->getXmlRootName();
+            $rootNamespace = $metadata->getXmlRootNamespace() ?: $this->getClassDefaultNamespace($metadata);
         } else {
             $rootName = $rootName ?: ($this->defaultRootName);
             $rootNamespace = $rootNamespace ?: $this->defaultRootNamespace;
@@ -162,7 +162,7 @@ final class XmlSerializationVisitor extends AbstractVisitor implements Serializa
         }
     }
 
-    public function startVisitingObject(ClassMetadata $metadata, object $data, array $type): void
+    public function startVisitingObject(ClassMetadataInterface $metadata, object $data, array $type): void
     {
         $this->objectMetadataStack->push($metadata);
 
@@ -291,7 +291,7 @@ final class XmlSerializationVisitor extends AbstractVisitor implements Serializa
         return !$element->hasChildNodes() && !$element->hasAttributes();
     }
 
-    public function endVisitingObject(ClassMetadata $metadata, object $data, array $type)
+    public function endVisitingObject(ClassMetadataInterface $metadata, object $data, array $type)
     {
         $this->objectMetadataStack->pop();
     }
@@ -387,12 +387,12 @@ final class XmlSerializationVisitor extends AbstractVisitor implements Serializa
     /**
      * Adds namespace attributes to the XML root element
      *
-     * @param \JMS\Serializer\Metadata\ClassMetadata $metadata
-     * @param \DOMElement $element
+     * @param ClassMetadataInterface $metadata
+     * @param \DOMElement            $element
      */
-    private function addNamespaceAttributes(ClassMetadata $metadata, \DOMElement $element)
+    private function addNamespaceAttributes(ClassMetadataInterface $metadata, \DOMElement $element)
     {
-        foreach ($metadata->xmlNamespaces as $prefix => $uri) {
+        foreach ($metadata->getXmlNamespaces() as $prefix => $uri) {
             $attribute = 'xmlns';
             if ($prefix !== '') {
                 $attribute .= ':' . $prefix;
@@ -429,8 +429,8 @@ final class XmlSerializationVisitor extends AbstractVisitor implements Serializa
         }
     }
 
-    private function getClassDefaultNamespace(ClassMetadata $metadata)
+    private function getClassDefaultNamespace(ClassMetadataInterface $metadata)
     {
-        return (isset($metadata->xmlNamespaces['']) ? $metadata->xmlNamespaces[''] : null);
+        return $metadata->getXmlNamespaces()[''] ?? null;
     }
 }

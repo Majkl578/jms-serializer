@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 final class VersionExclusionStrategy implements ExclusionStrategyInterface
@@ -20,7 +20,7 @@ final class VersionExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
+    public function shouldSkipClass(ClassMetadataInterface $metadata, Context $navigatorContext): bool
     {
         return false;
     }

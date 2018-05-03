@@ -15,6 +15,7 @@ use JMS\Serializer\GraphNavigator\SerializationGraphNavigator;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\Driver\AnnotationDriver;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\SerializationContext;
@@ -49,6 +50,8 @@ class GraphNavigatorTest extends \PHPUnit\Framework\TestCase
     public function testNavigatorPassesInstanceOnSerialization()
     {
         $object = new SerializableClass;
+
+        /** @var ClassMetadataInterface $metadata */
         $metadata = $this->metadataFactory->getMetadataForClass(get_class($object));
 
         $self = $this;
@@ -65,7 +68,7 @@ class GraphNavigatorTest extends \PHPUnit\Framework\TestCase
         $exclusionStrategy->expects($this->once())
             ->method('shouldSkipProperty')
             ->will($this->returnCallback(function ($propertyMetadata, $passedContext) use ($context, $metadata, $self) {
-                $self->assertSame($metadata->propertyMetadata['foo'], $propertyMetadata);
+                $self->assertSame($metadata->getProperties()['foo'], $propertyMetadata);
                 $self->assertSame($context, $passedContext);
                 return false;
             }));
@@ -82,6 +85,8 @@ class GraphNavigatorTest extends \PHPUnit\Framework\TestCase
     public function testNavigatorPassesNullOnDeserialization()
     {
         $class = __NAMESPACE__ . '\SerializableClass';
+
+        /** @var ClassMetadataInterface $metadata */
         $metadata = $this->metadataFactory->getMetadataForClass($class);
 
         $this->context = $this->getMockBuilder(DeserializationContext::class)->getMock();
@@ -96,7 +101,7 @@ class GraphNavigatorTest extends \PHPUnit\Framework\TestCase
 
         $exclusionStrategy->expects($this->once())
             ->method('shouldSkipProperty')
-            ->with($metadata->propertyMetadata['foo'], $this->callback(function ($navigatorContext) use ($context) {
+            ->with($metadata->getProperties()['foo'], $this->callback(function ($navigatorContext) use ($context) {
                 return $navigatorContext === $context;
             }));
 

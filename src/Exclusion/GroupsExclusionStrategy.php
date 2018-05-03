@@ -6,7 +6,7 @@ namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\RuntimeException;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 final class GroupsExclusionStrategy implements ExclusionStrategyInterface
@@ -41,7 +41,7 @@ final class GroupsExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
+    public function shouldSkipClass(ClassMetadataInterface $metadata, Context $navigatorContext): bool
     {
         return false;
     }

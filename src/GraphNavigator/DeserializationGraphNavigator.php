@@ -20,7 +20,7 @@ use JMS\Serializer\Expression\ExpressionEvaluatorInterface;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\NullAwareVisitorInterface;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 use Metadata\MetadataFactoryInterface;
@@ -144,14 +144,14 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
                     return $rs;
                 }
 
-                /** @var $metadata ClassMetadata */
+                /** @var $metadata ClassMetadataInterface */
                 $metadata = $this->metadataFactory->getMetadataForClass($type['name']);
 
-                if ($metadata->usingExpression && !$this->expressionExclusionStrategy) {
-                    throw new ExpressionLanguageRequiredException("To use conditional exclude/expose in {$metadata->name} you must configure the expression language.");
+                if ($metadata->getUsingExpression() && !$this->expressionExclusionStrategy) {
+                    throw new ExpressionLanguageRequiredException("To use conditional exclude/expose in {$metadata->getName()} you must configure the expression language.");
                 }
 
-                if (!empty($metadata->discriminatorMap) && $type['name'] === $metadata->discriminatorBaseClass) {
+                if (!empty($metadata->getDiscriminatorMap()) && $type['name'] === $metadata->getDiscriminatorBaseClass()) {
                     $metadata = $this->resolveMetadata($data, $metadata);
                 }
 
@@ -166,7 +166,7 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
                 $object = $this->objectConstructor->construct($this->visitor, $metadata, $data, $type, $this->context);
 
                 $this->visitor->startVisitingObject($metadata, $object, $type);
-                foreach ($metadata->propertyMetadata as $propertyMetadata) {
+                foreach ($metadata->getProperties() as $propertyMetadata) {
                     if ($this->exclusionStrategy->shouldSkipProperty($propertyMetadata, $this->context)) {
                         continue;
                     }
@@ -196,33 +196,33 @@ final class DeserializationGraphNavigator extends GraphNavigator implements Grap
         }
     }
 
-    private function resolveMetadata($data, ClassMetadata $metadata)
+    private function resolveMetadata($data, ClassMetadataInterface $metadata)
     {
         $typeValue = $this->visitor->visitDiscriminatorMapProperty($data, $metadata);
 
-        if (!isset($metadata->discriminatorMap[$typeValue])) {
+        if (!isset($metadata->getDiscriminatorMap()[$typeValue])) {
             throw new LogicException(sprintf(
                 'The type value "%s" does not exist in the discriminator map of class "%s". Available types: %s',
                 $typeValue,
-                $metadata->name,
-                implode(', ', array_keys($metadata->discriminatorMap))
+                $metadata->getName(),
+                implode(', ', array_keys($metadata->getDiscriminatorMap()))
             ));
         }
 
-        return $this->metadataFactory->getMetadataForClass($metadata->discriminatorMap[$typeValue]);
+        return $this->metadataFactory->getMetadataForClass($metadata->getDiscriminatorMap()[$typeValue]);
     }
 
-    private function afterVisitingObject(ClassMetadata $metadata, $object, array $type): void
+    private function afterVisitingObject(ClassMetadataInterface $metadata, $object, array $type): void
     {
         $this->context->decreaseDepth();
         $this->context->popClassMetadata();
 
-        foreach ($metadata->postDeserializeMethods as $method) {
+        foreach ($metadata->getPostDeserializeMethods() as $method) {
             $method->invoke($object);
         }
 
-        if ($this->dispatcher->hasListeners('serializer.post_deserialize', $metadata->name, $this->format)) {
-            $this->dispatcher->dispatch('serializer.post_deserialize', $metadata->name, $this->format, new ObjectEvent($this->context, $object, $type));
+        if ($this->dispatcher->hasListeners('serializer.post_deserialize', $metadata->getName(), $this->format)) {
+            $this->dispatcher->dispatch('serializer.post_deserialize', $metadata->getName(), $this->format, new ObjectEvent($this->context, $object, $type));
         }
     }
 }

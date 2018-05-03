@@ -18,7 +18,7 @@ use Metadata\PropertyMetadata as BasePropertyMetadata;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class ClassMetadata extends MergeableClassMetadata
+class ClassMetadata extends MergeableClassMetadata implements ClassMetadataInterface
 {
     const ACCESSOR_ORDER_UNDEFINED = 'undefined';
     const ACCESSOR_ORDER_ALPHABETICAL = 'alphabetical';
@@ -33,26 +33,198 @@ class ClassMetadata extends MergeableClassMetadata
     /** @var \ReflectionMethod[] */
     public $postDeserializeMethods = [];
 
+    /** @var string|null */
     public $xmlRootName;
+
+    /** @var string|null */
     public $xmlRootNamespace;
+
+    /** @var string|null */
     public $xmlRootPrefix;
+
+    /** @var string[] */
     public $xmlNamespaces = [];
+
+    /** @var string */
     public $accessorOrder;
+
+    /** @var string[]|null */
     public $customOrder;
+
+    /** @var bool */
     public $usingExpression = false;
+
+    /** @var bool */
     public $isList = false;
+
+    /** @var bool */
     public $isMap = false;
 
+    /** @var bool */
     public $discriminatorDisabled = false;
+
+    /** @var string|null */
     public $discriminatorBaseClass;
+
+    /** @var string|null */
     public $discriminatorFieldName;
+
+    /** @var string|null */
     public $discriminatorValue;
+
+    /** @var string[] */
     public $discriminatorMap = [];
+
+    /** @var string[] */
     public $discriminatorGroups = [];
 
+    /** @var bool */
     public $xmlDiscriminatorAttribute = false;
+
+    /** @var bool */
     public $xmlDiscriminatorCData = true;
+
+    /** @var string|null */
     public $xmlDiscriminatorNamespace;
+
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return PropertyMetadata[]
+     */
+    public function getProperties() : array
+    {
+        return $this->propertyMetadata;
+    }
+
+    public function getAccessorOrder() : string
+    {
+        return $this->accessorOrder;
+    }
+
+    /**
+     * @return string[]|null
+     */
+    public function getCustomOrder() : ?array
+    {
+        return $this->customOrder;
+    }
+
+    public function getUsingExpression() : bool
+    {
+        return $this->usingExpression;
+    }
+
+    public function isList() : bool
+    {
+        return $this->isList;
+    }
+
+    public function isMap() : bool
+    {
+        return $this->isMap;
+    }
+
+    public function gesDiscriminatorDisabled() : bool
+    {
+        return $this->discriminatorDisabled;
+    }
+
+    public function getDiscriminatorBaseClass() : ?string
+    {
+        return $this->discriminatorBaseClass;
+    }
+
+    public function getDiscriminatorFieldName() : ?string
+    {
+        return $this->discriminatorFieldName;
+    }
+
+    public function getDiscriminatorValue() : ?string
+    {
+        return $this->discriminatorValue;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDiscriminatorMap() : array
+    {
+        return $this->discriminatorMap;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDiscriminatorGroups() : array
+    {
+        return $this->discriminatorGroups;
+    }
+
+    public function getXmlRootName() : ?string
+    {
+        return $this->xmlRootName;
+    }
+
+    public function getXmlRootNamespace() : ?string
+    {
+        return $this->xmlRootNamespace;
+    }
+
+    public function getXmlRootPrefix() : ?string
+    {
+        return $this->xmlRootPrefix;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getXmlNamespaces() : array
+    {
+        return $this->xmlNamespaces;
+    }
+
+    public function getsXmlDiscriminatorAttribute() : bool
+    {
+        return $this->xmlDiscriminatorAttribute;
+    }
+
+    public function getXmlDiscriminatorCData() : bool
+    {
+        return $this->xmlDiscriminatorCData;
+    }
+
+    public function getXmlDiscriminatorNamespace() : ?string
+    {
+        return $this->xmlDiscriminatorNamespace;
+    }
+
+    /**
+     * @return \ReflectionMethod[]
+     */
+    public function getPreSerializeMethods() : array
+    {
+        return $this->preSerializeMethods;
+    }
+
+    /**
+     * @return \ReflectionMethod[]
+     */
+    public function getPostSerializeMethods() : array
+    {
+        return $this->postSerializeMethods;
+    }
+
+    /**
+     * @return \ReflectionMethod[]
+     */
+    public function getPostDeserializeMethods() : array
+    {
+        return $this->postDeserializeMethods;
+    }
 
     public function setDiscriminator($fieldName, array $map, array $groups = []):void
     {

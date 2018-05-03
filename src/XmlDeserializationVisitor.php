@@ -9,7 +9,7 @@ use JMS\Serializer\Exception\LogicException;
 use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Exception\XmlErrorException;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 
@@ -127,7 +127,7 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
 
         if ($namespace === null && $this->objectMetadataStack->count()) {
             $classMetadata = $this->objectMetadataStack->top();
-            $namespace = isset($classMetadata->xmlNamespaces['']) ? $classMetadata->xmlNamespaces[''] : $namespace;
+            $namespace = $classMetadata->getXmlNamespaces()[''] ?? $namespace;
             if ($namespace === null) {
                 $namespaces = $data->getDocNamespaces();
                 if (isset($namespaces[''])) {
@@ -187,34 +187,34 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
         }
     }
 
-    public function visitDiscriminatorMapProperty($data, ClassMetadata $metadata): string
+    public function visitDiscriminatorMapProperty($data, ClassMetadataInterface $metadata): string
     {
         switch (true) {
             // Check XML attribute without namespace for discriminatorFieldName
-            case $metadata->xmlDiscriminatorAttribute && null === $metadata->xmlDiscriminatorNamespace && isset($data->attributes()->{$metadata->discriminatorFieldName}):
-                return (string)$data->attributes()->{$metadata->discriminatorFieldName};
+            case $metadata->getsXmlDiscriminatorAttribute() && null === $metadata->getXmlDiscriminatorNamespace() && isset($data->attributes()->{$metadata->getDiscriminatorFieldName()}):
+                return (string)$data->attributes()->{$metadata->getDiscriminatorFieldName()};
 
             // Check XML attribute with namespace for discriminatorFieldName
-            case $metadata->xmlDiscriminatorAttribute && null !== $metadata->xmlDiscriminatorNamespace && isset($data->attributes($metadata->xmlDiscriminatorNamespace)->{$metadata->discriminatorFieldName}):
-                return (string)$data->attributes($metadata->xmlDiscriminatorNamespace)->{$metadata->discriminatorFieldName};
+            case $metadata->getsXmlDiscriminatorAttribute() && null !== $metadata->getXmlDiscriminatorNamespace() && isset($data->attributes($metadata->getXmlDiscriminatorNamespace())->{$metadata->getDiscriminatorFieldName()}):
+                return (string)$data->attributes($metadata->getXmlDiscriminatorNamespace())->{$metadata->getDiscriminatorFieldName()};
 
             // Check XML element with namespace for discriminatorFieldName
-            case !$metadata->xmlDiscriminatorAttribute && null !== $metadata->xmlDiscriminatorNamespace && isset($data->children($metadata->xmlDiscriminatorNamespace)->{$metadata->discriminatorFieldName}):
-                return (string)$data->children($metadata->xmlDiscriminatorNamespace)->{$metadata->discriminatorFieldName};
+            case !$metadata->getsXmlDiscriminatorAttribute() && null !== $metadata->getXmlDiscriminatorNamespace() && isset($data->children($metadata->getXmlDiscriminatorNamespace())->{$metadata->getDiscriminatorFieldName()}):
+                return (string)$data->children($metadata->getXmlDiscriminatorNamespace())->{$metadata->getDiscriminatorFieldName()};
             // Check XML element for discriminatorFieldName
-            case isset($data->{$metadata->discriminatorFieldName}):
-                return (string)$data->{$metadata->discriminatorFieldName};
+            case isset($data->{$metadata->getDiscriminatorFieldName()}):
+                return (string)$data->{$metadata->getDiscriminatorFieldName()};
 
             default:
                 throw new LogicException(sprintf(
                     'The discriminator field name "%s" for base-class "%s" was not found in input data.',
-                    $metadata->discriminatorFieldName,
-                    $metadata->name
+                    $metadata->getDiscriminatorFieldName(),
+                    $metadata->getName()
                 ));
         }
     }
 
-    public function startVisitingObject(ClassMetadata $metadata, object $object, array $type): void
+    public function startVisitingObject(ClassMetadataInterface $metadata, object $object, array $type): void
     {
         $this->setCurrentObject($object);
         $this->objectMetadataStack->push($metadata);
@@ -284,12 +284,13 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
     }
 
     /**
-     * @param ClassMetadata $metadata
-     * @param mixed $data
-     * @param array $type
+     * @param ClassMetadataInterface $metadata
+     * @param mixed                  $data
+     * @param array                  $type
+     *
      * @return mixed
      */
-    public function endVisitingObject(ClassMetadata $metadata, $data, array $type): object
+    public function endVisitingObject(ClassMetadataInterface $metadata, $data, array $type): object
     {
         $rs = $this->currentObject;
         $this->objectMetadataStack->pop();

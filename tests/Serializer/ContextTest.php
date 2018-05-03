@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Tests\Serializer;
 
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
@@ -97,7 +97,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $exclusionStrategy = $this->getMockBuilder('JMS\Serializer\Exclusion\ExclusionStrategyInterface')->getMock();
         $exclusionStrategy->expects($this->any())
             ->method('shouldSkipClass')
-            ->will($this->returnCallback(function (ClassMetadata $classMetadata, SerializationContext $context) use ($self, $object, $child) {
+            ->will($this->returnCallback(function (ClassMetadataInterface $classMetadata, SerializationContext $context) use ($self, $object, $child) {
                 $stack = $context->getMetadataStack();
 
                 if ($object === $context->getObject()) {

@@ -6,7 +6,7 @@ namespace JMS\Serializer\Metadata\Driver;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as DoctrineClassMetadata;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
@@ -68,7 +68,7 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
 
     public function loadMetadataForClass(\ReflectionClass $class): ?\Metadata\ClassMetadata
     {
-        /** @var $classMetadata ClassMetadata */
+        /** @var $classMetadata ClassMetadataInterface */
         $classMetadata = $this->delegate->loadMetadataForClass($class);
 
         // Abort if the given class is not a mapped entity
@@ -80,7 +80,7 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
 
         // We base our scan on the internal driver's property list so that we
         // respect any internal white/blacklisting like in the AnnotationDriver
-        foreach ($classMetadata->propertyMetadata as $key => $propertyMetadata) {
+        foreach ($classMetadata->getProperties() as $key => $propertyMetadata) {
             /** @var $propertyMetadata PropertyMetadata */
 
             // If the inner driver provides a type, don't guess anymore.
@@ -89,7 +89,7 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
             }
 
             if ($this->hideProperty($doctrineMetadata, $propertyMetadata)) {
-                unset($classMetadata->propertyMetadata[$key]);
+                unset($classMetadata->getProperties()[$key]);
             }
 
             $this->setPropertyType($doctrineMetadata, $propertyMetadata);
@@ -106,10 +106,10 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
     }
 
     /**
-     * @param DoctrineClassMetadata $doctrineMetadata
-     * @param ClassMetadata $classMetadata
+     * @param DoctrineClassMetadata  $doctrineMetadata
+     * @param ClassMetadataInterface $classMetadata
      */
-    protected function setDiscriminator(DoctrineClassMetadata $doctrineMetadata, ClassMetadata $classMetadata): void
+    protected function setDiscriminator(DoctrineClassMetadata $doctrineMetadata, ClassMetadataInterface $classMetadata): void
     {
     }
 

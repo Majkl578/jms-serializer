@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
@@ -18,11 +18,11 @@ interface ExclusionStrategyInterface
     /**
      * Whether the class should be skipped.
      *
-     * @param ClassMetadata $metadata
+     * @param ClassMetadataInterface $metadata
      *
      * @return boolean
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $context): bool;
+    public function shouldSkipClass(ClassMetadataInterface $metadata, Context $context): bool;
 
     /**
      * Whether the property should be skipped.

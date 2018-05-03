@@ -228,10 +228,10 @@ class AnnotationDriver implements DriverInterface
                 }
 
                 if ($propertyMetadata->inline) {
-                    $classMetadata->isList = $classMetadata->isList || PropertyMetadata::isCollectionList($propertyMetadata->type);
-                    $classMetadata->isMap = $classMetadata->isMap || PropertyMetadata::isCollectionMap($propertyMetadata->type);
+                    $classMetadata->isList = $classMetadata->isList() || PropertyMetadata::isCollectionList($propertyMetadata->type);
+                    $classMetadata->isMap = $classMetadata->isMap() || PropertyMetadata::isCollectionMap($propertyMetadata->type);
 
-                    if ($classMetadata->isMap && $classMetadata->isList) {
+                    if ($classMetadata->isMap() && $classMetadata->isList()) {
                         throw new InvalidMetadataException("Can not have an inline map and and inline map on the same class");
                     }
                 }

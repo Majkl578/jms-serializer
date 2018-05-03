@@ -11,7 +11,7 @@ use JMS\Serializer\Exclusion\DisjunctExclusionStrategy;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\Exclusion\GroupsExclusionStrategy;
 use JMS\Serializer\Exclusion\VersionExclusionStrategy;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use Metadata\MetadataFactory;
 use Metadata\MetadataFactoryInterface;
@@ -193,7 +193,7 @@ abstract class Context
         return $this->format;
     }
 
-    public function pushClassMetadata(ClassMetadata $metadata): void
+    public function pushClassMetadata(ClassMetadataInterface $metadata): void
     {
         $this->metadataStack->push($metadata);
     }
@@ -216,7 +216,7 @@ abstract class Context
     {
         $metadata = $this->metadataStack->pop();
 
-        if (!$metadata instanceof ClassMetadata) {
+        if (!$metadata instanceof ClassMetadataInterface) {
             throw new RuntimeException('Context metadataStack not working well');
         }
     }

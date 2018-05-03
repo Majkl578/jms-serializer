@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Visitor;
 
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\VisitorInterface;
 
@@ -62,11 +62,12 @@ interface DeserializationVisitorInterface extends VisitorInterface
     /**
      * Returns the class name based on the type of the discriminator map value
      *
-     * @param $data
-     * @param ClassMetadata $metadata
+     * @param                        $data
+     * @param ClassMetadataInterface $metadata
+     *
      * @return string
      */
-    public function visitDiscriminatorMapProperty($data, ClassMetadata $metadata): string;
+    public function visitDiscriminatorMapProperty($data, ClassMetadataInterface $metadata): string;
 
     /**
      * @param mixed $data
@@ -79,13 +80,13 @@ interface DeserializationVisitorInterface extends VisitorInterface
     /**
      * Called before the properties of the object are being visited.
      *
-     * @param ClassMetadata $metadata
-     * @param mixed $data
-     * @param array $type
+     * @param ClassMetadataInterface $metadata
+     * @param mixed                  $data
+     * @param array                  $type
      *
      * @return void
      */
-    public function startVisitingObject(ClassMetadata $metadata, object $data, array $type): void;
+    public function startVisitingObject(ClassMetadataInterface $metadata, object $data, array $type): void;
 
     /**
      * @param PropertyMetadata $metadata
@@ -98,13 +99,13 @@ interface DeserializationVisitorInterface extends VisitorInterface
     /**
      * Called after all properties of the object have been visited.
      *
-     * @param ClassMetadata $metadata
-     * @param mixed $data
-     * @param array $type
+     * @param ClassMetadataInterface $metadata
+     * @param mixed                  $data
+     * @param array                  $type
      *
      * @return mixed
      */
-    public function endVisitingObject(ClassMetadata $metadata, $data, array $type): object;
+    public function endVisitingObject(ClassMetadataInterface $metadata, $data, array $type): object;
 
     /**
      * @param mixed $data

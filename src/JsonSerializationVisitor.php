@@ -6,7 +6,7 @@ namespace JMS\Serializer;
 
 use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 
@@ -85,18 +85,18 @@ final class JsonSerializationVisitor extends AbstractVisitor implements Serializ
         return $rs;
     }
 
-    public function startVisitingObject(ClassMetadata $metadata, object $data, array $type): void
+    public function startVisitingObject(ClassMetadataInterface $metadata, object $data, array $type): void
     {
         \array_push($this->dataStack, $this->data);
-        $this->data = $metadata->isMap === true ? new \ArrayObject() : [];
+        $this->data = $metadata->isMap() === true ? new \ArrayObject() : [];
     }
 
-    public function endVisitingObject(ClassMetadata $metadata, object $data, array $type)
+    public function endVisitingObject(ClassMetadataInterface $metadata, object $data, array $type)
     {
         $rs = $this->data;
         $this->data = \array_pop($this->dataStack);
 
-        if ($metadata->isList !== true && empty($rs)) {
+        if ($metadata->isList() !== true && empty($rs)) {
             return new \ArrayObject();
         }
         return $rs;

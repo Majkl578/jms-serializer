@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
-use JMS\Serializer\Metadata\ClassMetadata;
+use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 
 /**
@@ -16,7 +16,7 @@ final class DepthExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $context): bool
+    public function shouldSkipClass(ClassMetadataInterface $metadata, Context $context): bool
     {
         return $this->isTooDeep($context);
     }
