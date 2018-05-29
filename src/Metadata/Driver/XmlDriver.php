@@ -9,8 +9,11 @@ use JMS\Serializer\Exception\InvalidMetadataException;
 use JMS\Serializer\Exception\XmlErrorException;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
+use JMS\Serializer\Metadata\ExpressionPropertyMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Metadata\VirtualPropertyMetadata;
+use JMS\Serializer\Metadata\VirtualPropertyMetadataInterface;
 use JMS\Serializer\Naming\PropertyNamingStrategyInterface;
 use JMS\Serializer\Type\Parser;
 use JMS\Serializer\Type\ParserInterface;
@@ -55,7 +58,7 @@ class XmlDriver extends AbstractFileDriver
         $metadata->fileResources[] = $class->getFileName();
         $exclusionPolicy = strtoupper((string)$elem->attributes()->{'exclusion-policy'}) ?: 'NONE';
         $excludeAll = null !== ($exclude = $elem->attributes()->exclude) ? 'true' === strtolower((string)$exclude) : false;
-        $classAccessType = (string)($elem->attributes()->{'access-type'} ?: PropertyMetadata::ACCESS_TYPE_PROPERTY);
+        $classAccessType = (string)($elem->attributes()->{'access-type'} ?: PropertyMetadataInterface::ACCESS_TYPE_PROPERTY);
 
         $propertiesMetadata = [];
         $propertiesNodes = [];
@@ -155,8 +158,8 @@ class XmlDriver extends AbstractFileDriver
             foreach ($propertiesMetadata as $propertyKey => $pMetadata) {
 
                 $isExclude = false;
-                $isExpose = $pMetadata instanceof VirtualPropertyMetadata
-                    || $pMetadata instanceof ExpressionPropertyMetadata;
+                $isExpose = $pMetadata instanceof VirtualPropertyMetadataInterface
+                    || $pMetadata instanceof ExpressionPropertyMetadataInterface;
 
                 $pElem = $propertiesNodes[$propertyKey];
                 if (!empty($pElem)) {
@@ -290,7 +293,7 @@ class XmlDriver extends AbstractFileDriver
                     if (null !== $readOnly = $pElem->attributes()->{'read-only'}) {
                         $pMetadata->readOnly = 'true' === strtolower((string)$readOnly);
                     } else {
-                        $pMetadata->readOnly = $pMetadata->readOnly || $readOnlyClass;
+                        $pMetadata->readOnly = $pMetadata->isReadOnly() || $readOnlyClass;
                     }
 
                     $getter = $pElem->attributes()->{'accessor-getter'};
@@ -306,12 +309,12 @@ class XmlDriver extends AbstractFileDriver
                     }
                 }
 
-                if ($pMetadata->inline) {
+                if ($pMetadata->isInline()) {
                     $metadata->isList = $metadata->isList || PropertyMetadata::isCollectionList($pMetadata->type);
                     $metadata->isMap = $metadata->isMap || PropertyMetadata::isCollectionMap($pMetadata->type);
                 }
 
-                if (!$pMetadata->serializedName) {
+                if (!$pMetadata->getSerializedName()) {
                     $pMetadata->serializedName = $this->namingStrategy->translateName($pMetadata);
                 }
 

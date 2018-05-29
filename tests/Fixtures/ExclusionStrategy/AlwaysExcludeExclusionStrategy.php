@@ -8,7 +8,7 @@ use JMS\Serializer\Context;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 class AlwaysExcludeExclusionStrategy implements ExclusionStrategyInterface
 {
@@ -17,7 +17,7 @@ class AlwaysExcludeExclusionStrategy implements ExclusionStrategyInterface
         return true;
     }
 
-    public function shouldSkipProperty(PropertyMetadata $property, Context $context): bool
+    public function shouldSkipProperty(PropertyMetadataInterface $property, Context $context): bool
     {
         return false;
     }

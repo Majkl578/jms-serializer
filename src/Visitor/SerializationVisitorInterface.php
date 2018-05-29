@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Visitor;
 
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\VisitorInterface;
 
 /**
@@ -79,12 +79,12 @@ interface SerializationVisitorInterface extends VisitorInterface
     public function startVisitingObject(ClassMetadataInterface $metadata, object $data, array $type): void;
 
     /**
-     * @param PropertyMetadata $metadata
+     * @param PropertyMetadataInterface $metadata
      * @param mixed $data
      *
      * @return void
      */
-    public function visitProperty(PropertyMetadata $metadata, $data): void;
+    public function visitProperty(PropertyMetadataInterface $metadata, $data): void;
 
     /**
      * Called after all properties of the object have been visited.

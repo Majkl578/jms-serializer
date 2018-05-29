@@ -16,7 +16,7 @@ interface ClassMetadataInterface extends MergeableInterface
     public function getName() : string;
 
     /**
-     * @return PropertyMetadata[]
+     * @return PropertyMetadataInterface[]
      */
     public function getProperties() : array;
 

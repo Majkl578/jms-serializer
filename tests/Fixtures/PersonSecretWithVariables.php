@@ -6,7 +6,7 @@ namespace JMS\Serializer\Tests\Fixtures;
 
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Context;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 /**
  */
@@ -23,7 +23,7 @@ class PersonSecretWithVariables
      */
     public $gender;
 
-    public function test(PropertyMetadata $propertyMetadata, Context $context)
+    public function test(PropertyMetadataInterface $propertyMetadata, Context $context)
     {
         return true;
     }

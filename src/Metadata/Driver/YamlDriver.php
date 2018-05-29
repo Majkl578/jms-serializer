@@ -9,8 +9,11 @@ use JMS\Serializer\Exception\InvalidMetadataException;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
+use JMS\Serializer\Metadata\ExpressionPropertyMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Metadata\VirtualPropertyMetadata;
+use JMS\Serializer\Metadata\VirtualPropertyMetadataInterface;
 use JMS\Serializer\Naming\PropertyNamingStrategyInterface;
 use JMS\Serializer\Type\Parser;
 use JMS\Serializer\Type\ParserInterface;
@@ -48,7 +51,7 @@ class YamlDriver extends AbstractFileDriver
         $metadata->fileResources[] = $class->getFileName();
         $exclusionPolicy = isset($config['exclusion_policy']) ? strtoupper($config['exclusion_policy']) : 'NONE';
         $excludeAll = isset($config['exclude']) ? (Boolean)$config['exclude'] : false;
-        $classAccessType = isset($config['access_type']) ? $config['access_type'] : PropertyMetadata::ACCESS_TYPE_PROPERTY;
+        $classAccessType = isset($config['access_type']) ? $config['access_type'] : PropertyMetadataInterface::ACCESS_TYPE_PROPERTY;
         $readOnlyClass = isset($config['read_only']) ? (Boolean)$config['read_only'] : false;
         $this->addClassProperties($metadata, $config);
 
@@ -85,8 +88,8 @@ class YamlDriver extends AbstractFileDriver
 
             foreach ($propertiesMetadata as $pName => $pMetadata) {
                 $isExclude = false;
-                $isExpose = $pMetadata instanceof VirtualPropertyMetadata
-                    || $pMetadata instanceof ExpressionPropertyMetadata
+                $isExpose = $pMetadata instanceof VirtualPropertyMetadataInterface
+                    || $pMetadata instanceof ExpressionPropertyMetadataInterface
                     || (isset($config['properties']) && array_key_exists($pName, $config['properties']));
 
                 if (isset($config['properties'][$pName])) {
@@ -211,7 +214,7 @@ class YamlDriver extends AbstractFileDriver
                     if (isset($pConfig['read_only'])) {
                         $pMetadata->readOnly = (Boolean)$pConfig['read_only'];
                     } else {
-                        $pMetadata->readOnly = $pMetadata->readOnly || $readOnlyClass;
+                        $pMetadata->readOnly = $pMetadata->isReadOnly() || $readOnlyClass;
                     }
 
                     $pMetadata->setAccessor(
@@ -229,13 +232,13 @@ class YamlDriver extends AbstractFileDriver
                     }
                 }
 
-                if (!$pMetadata->serializedName) {
+                if (!$pMetadata->getSerializedName()) {
                     $pMetadata->serializedName = $this->namingStrategy->translateName($pMetadata);
                 }
 
-                if ($pMetadata->inline) {
-                    $metadata->isList = $metadata->isList || PropertyMetadata::isCollectionList($pMetadata->type);
-                    $metadata->isMap = $metadata->isMap || PropertyMetadata::isCollectionMap($pMetadata->type);
+                if ($pMetadata->isInline()) {
+                    $metadata->isList = $metadata->isList || PropertyMetadata::isCollectionList($pMetadata->getType());
+                    $metadata->isMap = $metadata->isMap || PropertyMetadata::isCollectionMap($pMetadata->getType());
                 }
 
                 if (isset($config['properties'][$pName])) {

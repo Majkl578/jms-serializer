@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Tests\Serializer;
 
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;
 use JMS\Serializer\Tests\Fixtures\Author;
@@ -106,8 +106,8 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
                 if ($child === $context->getObject()) {
                     $self->assertEquals(2, $stack->count());
-                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\Node', $stack[1]->name);
-                    $self->assertEquals('children', $stack[0]->name);
+                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\Node', $stack[1]->getName());
+                    $self->assertEquals('children', $stack[0]->getName());
                 }
 
                 return false;
@@ -115,19 +115,19 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $exclusionStrategy->expects($this->any())
             ->method('shouldSkipProperty')
-            ->will($this->returnCallback(function (PropertyMetadata $propertyMetadata, SerializationContext $context) use ($self, $object, $child) {
+            ->will($this->returnCallback(function (PropertyMetadataInterface $propertyMetadata, SerializationContext $context) use ($self, $object, $child) {
                 $stack = $context->getMetadataStack();
 
-                if ('JMS\Serializer\Tests\Fixtures\Node' === $propertyMetadata->class && $propertyMetadata->name === 'children') {
+                if ('JMS\Serializer\Tests\Fixtures\Node' === $propertyMetadata->getClass() && $propertyMetadata->getName() === 'children') {
                     $self->assertEquals(1, $stack->count());
-                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\Node', $stack[0]->name);
+                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\Node', $stack[0]->getName());
                 }
 
-                if ('JMS\Serializer\Tests\Fixtures\InlineChild' === $propertyMetadata->class) {
+                if ('JMS\Serializer\Tests\Fixtures\InlineChild' === $propertyMetadata->getClass()) {
                     $self->assertEquals(3, $stack->count());
-                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\Node', $stack[2]->name);
-                    $self->assertEquals('children', $stack[1]->name);
-                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\InlineChild', $stack[0]->name);
+                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\Node', $stack[2]->getName());
+                    $self->assertEquals('children', $stack[1]->getName());
+                    $self->assertEquals('JMS\Serializer\Tests\Fixtures\InlineChild', $stack[0]->getName());
                 }
 
                 return false;

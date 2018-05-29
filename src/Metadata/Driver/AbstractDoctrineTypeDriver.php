@@ -7,10 +7,10 @@ namespace JMS\Serializer\Metadata\Driver;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as DoctrineClassMetadata;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
-use JMS\Serializer\Metadata\PropertyMetadata;
-use JMS\Serializer\Metadata\StaticPropertyMetadata;
-use JMS\Serializer\Metadata\VirtualPropertyMetadata;
+use JMS\Serializer\Metadata\ExpressionPropertyMetadataInterface;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
+use JMS\Serializer\Metadata\StaticPropertyMetadataInterface;
+use JMS\Serializer\Metadata\VirtualPropertyMetadataInterface;
 use JMS\Serializer\Type\Parser;
 use JMS\Serializer\Type\ParserInterface;
 use Metadata\Driver\DriverInterface;
@@ -81,10 +81,10 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
         // We base our scan on the internal driver's property list so that we
         // respect any internal white/blacklisting like in the AnnotationDriver
         foreach ($classMetadata->getProperties() as $key => $propertyMetadata) {
-            /** @var $propertyMetadata PropertyMetadata */
+            /** @var $propertyMetadata PropertyMetadataInterface */
 
             // If the inner driver provides a type, don't guess anymore.
-            if ($propertyMetadata->type || $this->isVirtualProperty($propertyMetadata)) {
+            if ($propertyMetadata->getType() || $this->isVirtualProperty($propertyMetadata)) {
                 continue;
             }
 
@@ -98,11 +98,11 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
         return $classMetadata;
     }
 
-    private function isVirtualProperty(PropertyMetadata $propertyMetadata)
+    private function isVirtualProperty(PropertyMetadataInterface $propertyMetadata)
     {
-        return $propertyMetadata instanceof VirtualPropertyMetadata
-            || $propertyMetadata instanceof StaticPropertyMetadata
-            || $propertyMetadata instanceof ExpressionPropertyMetadata;
+        return $propertyMetadata instanceof VirtualPropertyMetadataInterface
+            || $propertyMetadata instanceof StaticPropertyMetadataInterface
+            || $propertyMetadata instanceof ExpressionPropertyMetadataInterface;
     }
 
     /**
@@ -115,18 +115,18 @@ abstract class AbstractDoctrineTypeDriver implements DriverInterface
 
     /**
      * @param DoctrineClassMetadata $doctrineMetadata
-     * @param PropertyMetadata $propertyMetadata
+     * @param PropertyMetadataInterface $propertyMetadata
      */
-    protected function hideProperty(DoctrineClassMetadata $doctrineMetadata, PropertyMetadata $propertyMetadata): bool
+    protected function hideProperty(DoctrineClassMetadata $doctrineMetadata, PropertyMetadataInterface $propertyMetadata): bool
     {
         return false;
     }
 
     /**
      * @param DoctrineClassMetadata $doctrineMetadata
-     * @param PropertyMetadata $propertyMetadata
+     * @param PropertyMetadataInterface $propertyMetadata
      */
-    protected function setPropertyType(DoctrineClassMetadata $doctrineMetadata, PropertyMetadata $propertyMetadata): void
+    protected function setPropertyType(DoctrineClassMetadata $doctrineMetadata, PropertyMetadataInterface $propertyMetadata): void
     {
     }
 

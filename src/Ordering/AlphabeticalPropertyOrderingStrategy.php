@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Ordering;
 
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 final class AlphabeticalPropertyOrderingStrategy implements PropertyOrderingInterface
 {
@@ -15,8 +15,8 @@ final class AlphabeticalPropertyOrderingStrategy implements PropertyOrderingInte
     {
         uasort(
             $properties,
-            function (PropertyMetadata $a, PropertyMetadata $b) : int {
-                return strcmp($a->name, $b->name);
+            function (PropertyMetadataInterface $a, PropertyMetadataInterface $b) : int {
+                return strcmp($a->getName(), $b->getName());
             }
         );
 

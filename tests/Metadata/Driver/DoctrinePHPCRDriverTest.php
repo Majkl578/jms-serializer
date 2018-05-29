@@ -28,7 +28,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
         $metadata = $this->getMetadata();
         self::assertEquals(
             ['name' => 'DateTime', 'params' => []],
-            $metadata->getProperties()['createdAt']->type
+            $metadata->getProperties()['createdAt']->getType()
         );
     }
 
@@ -37,7 +37,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
         $metadata = $this->getMetadata();
         self::assertEquals(
             ['name' => 'JMS\Serializer\Tests\Fixtures\DoctrinePHPCR\Author', 'params' => []],
-            $metadata->getProperties()['author']->type
+            $metadata->getProperties()['author']->getType()
         );
     }
 
@@ -49,7 +49,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
             ['name' => 'ArrayCollection', 'params' => [
                 ['name' => 'JMS\Serializer\Tests\Fixtures\DoctrinePHPCR\Comment', 'params' => []]]
             ],
-            $metadata->getProperties()['comments']->type
+            $metadata->getProperties()['comments']->getType()
         );
     }
 
@@ -60,7 +60,7 @@ class DoctrinePHPCRDriverTest extends \PHPUnit\Framework\TestCase
         // This would be guessed as boolean but we've overridden it to integer
         self::assertEquals(
             ['name' => 'integer', 'params' => []],
-            $metadata->getProperties()['published']->type
+            $metadata->getProperties()['published']->getType()
         );
     }
 

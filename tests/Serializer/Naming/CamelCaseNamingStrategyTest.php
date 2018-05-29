@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Tests\Serializer\Naming;
 
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Naming\CamelCaseNamingStrategy;
 
 class CamelCaseNamingStrategyTest extends \PHPUnit\Framework\TestCase
@@ -22,8 +23,8 @@ class CamelCaseNamingStrategyTest extends \PHPUnit\Framework\TestCase
      */
     public function testCamelCaseNamingHandlesMultipleUppercaseLetters($propertyName, $expected)
     {
-        $mockProperty = $this->getMockBuilder('JMS\Serializer\Metadata\PropertyMetadata')->disableOriginalConstructor()->getMock();
-        $mockProperty->name = $propertyName;
+        $mockProperty = $this->getMockBuilder(PropertyMetadataInterface::class)->getMock();
+        $mockProperty->method('getName')->willReturn($propertyName);
 
         $strategy = new CamelCaseNamingStrategy();
         self::assertEquals($expected, $strategy->translateName($mockProperty));

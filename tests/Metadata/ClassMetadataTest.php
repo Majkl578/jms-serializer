@@ -6,6 +6,7 @@ namespace JMS\Serializer\Tests\Metadata;
 
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 class ClassMetadataTest extends \PHPUnit\Framework\TestCase
 {
@@ -60,10 +61,10 @@ class ClassMetadataTest extends \PHPUnit\Framework\TestCase
         $object = new PropertyMetadataPublicMethod();
 
         $metadata = new PropertyMetadata(get_class($object), $property);
-        $metadata->setAccessor(PropertyMetadata::ACCESS_TYPE_PUBLIC_METHOD, $getterInit, $setterInit);
+        $metadata->setAccessor(PropertyMetadataInterface::ACCESS_TYPE_PUBLIC_METHOD, $getterInit, $setterInit);
 
-        self::assertEquals($getterName, $metadata->getter);
-        self::assertEquals($setterName, $metadata->setter);
+        self::assertEquals($getterName, $metadata->getGetter());
+        self::assertEquals($setterName, $metadata->getSetter());
     }
 
     /**
@@ -77,7 +78,7 @@ class ClassMetadataTest extends \PHPUnit\Framework\TestCase
         $object = new PropertyMetadataPublicMethod();
 
         $metadata = new PropertyMetadata(get_class($object), 'e');
-        $metadata->setAccessor(PropertyMetadata::ACCESS_TYPE_PUBLIC_METHOD, $getter, $setter);
+        $metadata->setAccessor(PropertyMetadataInterface::ACCESS_TYPE_PUBLIC_METHOD, $getter, $setter);
     }
 
     public function providerPublicMethodData()

@@ -7,10 +7,9 @@ namespace JMS\Serializer\Accessor;
 use JMS\Serializer\Exception\ExpressionLanguageRequiredException;
 use JMS\Serializer\Exception\LogicException;
 use JMS\Serializer\Expression\ExpressionEvaluatorInterface;
-use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
-use JMS\Serializer\Metadata\PropertyMetadata;
-use JMS\Serializer\Metadata\StaticPropertyMetadata;
-use JMS\Serializer\Metadata\VirtualPropertyMetadata;
+use JMS\Serializer\Metadata\ExpressionPropertyMetadataInterface;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
+use JMS\Serializer\Metadata\StaticPropertyMetadataInterface;
 
 /**
  * @author Asmir Mustafic <goetas@gmail.com>
@@ -30,50 +29,50 @@ final class DefaultAccessorStrategy implements AccessorStrategyInterface
         $this->evaluator = $evaluator;
     }
 
-    public function getValue(object $object, PropertyMetadata $metadata)
+    public function getValue(object $object, PropertyMetadataInterface $metadata)
     {
-        if ($metadata instanceof StaticPropertyMetadata) {
-            return $metadata->getValue(null);
+        if ($metadata instanceof StaticPropertyMetadataInterface) {
+            return $metadata->getValue();
         }
 
-        if ($metadata instanceof ExpressionPropertyMetadata) {
+        if ($metadata instanceof ExpressionPropertyMetadataInterface) {
             if ($this->evaluator === null) {
-                throw new ExpressionLanguageRequiredException(sprintf('The property %s on %s requires the expression accessor strategy to be enabled.', $metadata->name, $metadata->class));
+                throw new ExpressionLanguageRequiredException(sprintf('The property %s on %s requires the expression accessor strategy to be enabled.', $metadata->getName(), $metadata->getClass()));
             }
 
-            return $this->evaluator->evaluate($metadata->expression, ['object' => $object]);
+            return $this->evaluator->evaluate($metadata->getExpression(), ['object' => $object]);
         }
 
-        if (null === $metadata->getter) {
-            if (!isset($this->readAccessors[$metadata->class])) {
-                $this->readAccessors[$metadata->class] = \Closure::bind(function ($o, $name) {
+        if (null === $metadata->getGetter()) {
+            if (!isset($this->readAccessors[$metadata->getClass()])) {
+                $this->readAccessors[$metadata->getClass()] = \Closure::bind(function ($o, $name) {
                     return $o->$name;
-                }, null, $metadata->class);
+                }, null, $metadata->getClass());
             }
 
-            return $this->readAccessors[$metadata->class]($object, $metadata->name);
+            return $this->readAccessors[$metadata->getClass()]($object, $metadata->getName());
         }
 
-        return $object->{$metadata->getter}();
+        return $object->{$metadata->getGetter()}();
     }
 
-    public function setValue(object $object, $value, PropertyMetadata $metadata): void
+    public function setValue(object $object, $value, PropertyMetadataInterface $metadata): void
     {
-        if ($metadata->readOnly) {
-            throw new LogicException(sprintf('%s on %s is read only.'), $metadata->name, $metadata->class);
+        if ($metadata->isReadOnly()) {
+            throw new LogicException(sprintf('%s on %s is read only.'), $metadata->getName(), $metadata->getClass());
         }
 
-        if (null === $metadata->setter) {
-            if (!isset($this->writeAccessors[$metadata->class])) {
-                $this->writeAccessors[$metadata->class] = \Closure::bind(function ($o, $name, $value) {
+        if (null === $metadata->getSetter()) {
+            if (!isset($this->writeAccessors[$metadata->getClass()])) {
+                $this->writeAccessors[$metadata->getClass()] = \Closure::bind(function ($o, $name, $value) {
                     $o->$name = $value;
-                }, null, $metadata->class);
+                }, null, $metadata->getClass());
             }
 
-            $this->writeAccessors[$metadata->class]($object, $metadata->name, $value);
+            $this->writeAccessors[$metadata->getClass()]($object, $metadata->getName(), $value);
             return;
         }
 
-        $object->{$metadata->setter}($value);
+        $object->{$metadata->getSetter()}($value);
     }
 }

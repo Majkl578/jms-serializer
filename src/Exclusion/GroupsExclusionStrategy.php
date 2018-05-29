@@ -7,7 +7,7 @@ namespace JMS\Serializer\Exclusion;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 final class GroupsExclusionStrategy implements ExclusionStrategyInterface
 {
@@ -49,23 +49,23 @@ final class GroupsExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
+    public function shouldSkipProperty(PropertyMetadataInterface $property, Context $navigatorContext): bool
     {
         if ($this->nestedGroups) {
             $groups = $this->getGroupsFor($navigatorContext);
 
-            if (!$property->groups) {
+            if (!$property->getGroups()) {
                 return !in_array(self::DEFAULT_GROUP, $groups);
             }
 
             return $this->shouldSkipUsingGroups($property, $groups);
         } else {
 
-            if (!$property->groups) {
+            if (!$property->getGroups()) {
                 return !isset($this->groups[self::DEFAULT_GROUP]);
             }
 
-            foreach ($property->groups as $group) {
+            foreach ($property->getGroups() as $group) {
                 if (isset($this->groups[$group])) {
                     return false;
                 }
@@ -74,9 +74,9 @@ final class GroupsExclusionStrategy implements ExclusionStrategyInterface
         }
     }
 
-    private function shouldSkipUsingGroups(PropertyMetadata $property, $groups)
+    private function shouldSkipUsingGroups(PropertyMetadataInterface $property, $groups)
     {
-        foreach ($property->groups as $group) {
+        foreach ($property->getGroups() as $group) {
             if (in_array($group, $groups)) {
                 return false;
             }

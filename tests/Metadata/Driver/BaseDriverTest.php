@@ -7,6 +7,7 @@ namespace JMS\Serializer\Tests\Metadata\Driver;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
 use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Metadata\VirtualPropertyMetadata;
 use JMS\Serializer\Tests\Fixtures\Discriminator\ObjectWithXmlAttributeDiscriminatorChild;
 use JMS\Serializer\Tests\Fixtures\Discriminator\ObjectWithXmlAttributeDiscriminatorParent;
@@ -113,9 +114,9 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         self::assertArrayHasKey('present', $m->getProperties());
         self::assertArrayHasKey('skipDefault', $m->getProperties());
 
-        self::assertTrue($m->getProperties()['absent']->xmlCollectionSkipWhenEmpty);
-        self::assertTrue($m->getProperties()['skipDefault']->xmlCollectionSkipWhenEmpty);
-        self::assertFalse($m->getProperties()['present']->xmlCollectionSkipWhenEmpty);
+        self::assertTrue($m->getProperties()['absent']->isXmlCollectionSkippedWhenEmpty());
+        self::assertTrue($m->getProperties()['skipDefault']->isXmlCollectionSkippedWhenEmpty());
+        self::assertFalse($m->getProperties()['present']->isXmlCollectionSkippedWhenEmpty());
     }
 
     public function testVirtualProperty()
@@ -128,7 +129,7 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         self::assertArrayHasKey('virtualSerializedValue', $m->getProperties());
         self::assertArrayHasKey('typedVirtualProperty', $m->getProperties());
 
-        self::assertEquals($m->getProperties()['virtualSerializedValue']->serializedName, 'test', 'Serialized name is missing');
+        self::assertEquals($m->getProperties()['virtualSerializedValue']->getSerializedName(), 'test', 'Serialized name is missing');
 
         $p = new VirtualPropertyMetadata($m->getName(), 'virtualValue');
         $p->getter = 'getVirtualValue';
@@ -159,7 +160,7 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         $m = $this->getDriver()->loadMetadataForClass(new \ReflectionClass('JMS\Serializer\Tests\Fixtures\ObjectWithXmlKeyValuePairs'));
 
         self::assertArrayHasKey('array', $m->getProperties());
-        self::assertTrue($m->getProperties()['array']->xmlKeyValuePairs);
+        self::assertTrue($m->getProperties()['array']->isXmlKeyValuePairs());
     }
 
     public function testExpressionVirtualPropertyWithExcludeAll()
@@ -306,9 +307,9 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(PropertyMetadata::class, $m->getProperties()['c']);
         self::assertInstanceOf(PropertyMetadata::class, $m->getProperties()['d']);
         self::assertInstanceOf(PropertyMetadata::class, $m->getProperties()['child']);
-        self::assertFalse($m->getProperties()['c']->skipWhenEmpty);
-        self::assertFalse($m->getProperties()['d']->skipWhenEmpty);
-        self::assertTrue($m->getProperties()['child']->skipWhenEmpty);
+        self::assertFalse($m->getProperties()['c']->isSkippedWhenEmpty());
+        self::assertFalse($m->getProperties()['d']->isSkippedWhenEmpty());
+        self::assertTrue($m->getProperties()['child']->isSkippedWhenEmpty());
     }
 
     public function testLoadDiscriminatorSubClass()
@@ -379,7 +380,7 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         /** @var ClassMetadataInterface $m */
         $m = $this->getDriver()->loadMetadataForClass(new \ReflectionClass('JMS\Serializer\Tests\Fixtures\Node'));
 
-        self::assertEquals(2, $m->getProperties()['children']->maxDepth);
+        self::assertEquals(2, $m->getProperties()['children']->getMaxDepth());
     }
 
     public function testPersonCData()
@@ -388,7 +389,7 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         $m = $this->getDriver()->loadMetadataForClass(new \ReflectionClass('JMS\Serializer\Tests\Fixtures\Person'));
 
         self::assertNotNull($m);
-        self::assertFalse($m->getProperties()['name']->xmlElementCData);
+        self::assertFalse($m->getProperties()['name']->isXmlElementCData());
     }
 
     public function testXmlNamespaceInheritanceMetadata()
@@ -499,7 +500,7 @@ abstract class BaseDriverTest extends \PHPUnit\Framework\TestCase
         $this->assetMetadataEquals($p, $m->getProperties()['qux']);
     }
 
-    private function assetMetadataEquals(PropertyMetadata $expected, PropertyMetadata $actual)
+    private function assetMetadataEquals(PropertyMetadataInterface $expected, PropertyMetadataInterface $actual)
     {
         $expectedVars = get_object_vars($expected);
         $actualVars = get_object_vars($actual);

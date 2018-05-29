@@ -6,7 +6,7 @@ namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 /**
  * @author Adrien Brault <adrien.brault@gmail.com>
@@ -24,7 +24,7 @@ final class DepthExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $context): bool
+    public function shouldSkipProperty(PropertyMetadataInterface $property, Context $context): bool
     {
         return $this->isTooDeep($context);
     }
@@ -38,11 +38,11 @@ final class DepthExclusionStrategy implements ExclusionStrategyInterface
         // iterate from the first added items to the lasts
         for ($i = $metadataStack->count() - 1; $i > 0; $i--) {
             $metadata = $metadataStack[$i];
-            if ($metadata instanceof PropertyMetadata) {
+            if ($metadata instanceof PropertyMetadataInterface) {
                 $nthProperty++;
                 $relativeDepth = $depth - $nthProperty;
 
-                if (null !== $metadata->maxDepth && $relativeDepth > $metadata->maxDepth) {
+                if (null !== $metadata->getMaxDepth() && $relativeDepth > $metadata->getMaxDepth()) {
                     return true;
                 }
             }

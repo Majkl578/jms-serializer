@@ -7,7 +7,7 @@ namespace JMS\Serializer;
 use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 
 final class JsonSerializationVisitor extends AbstractVisitor implements SerializationVisitorInterface
@@ -102,19 +102,19 @@ final class JsonSerializationVisitor extends AbstractVisitor implements Serializ
         return $rs;
     }
 
-    public function visitProperty(PropertyMetadata $metadata, $v): void
+    public function visitProperty(PropertyMetadataInterface $metadata, $v): void
     {
         try {
-            $v = $this->navigator->accept($v, $metadata->type);
+            $v = $this->navigator->accept($v, $metadata->getType());
         } catch (NotAcceptableException $e) {
             return;
         }
 
-        if (true === $metadata->skipWhenEmpty && ($v instanceof \ArrayObject || \is_array($v)) && 0 === count($v)) {
+        if (true === $metadata->isSkippedWhenEmpty() && ($v instanceof \ArrayObject || \is_array($v)) && 0 === count($v)) {
             return;
         }
 
-        if ($metadata->inline) {
+        if ($metadata->isInline()) {
             if (\is_array($v) || ($v instanceof \ArrayObject)) {
                 // concatenate the two array-like structures
                 // is there anything faster?
@@ -123,7 +123,7 @@ final class JsonSerializationVisitor extends AbstractVisitor implements Serializ
                 }
             }
         } else {
-            $this->data[$metadata->serializedName] = $v;
+            $this->data[$metadata->getSerializedName()] = $v;
         }
     }
 

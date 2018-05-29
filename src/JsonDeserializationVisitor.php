@@ -7,7 +7,7 @@ namespace JMS\Serializer;
 use JMS\Serializer\Exception\LogicException;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 
 final class JsonDeserializationVisitor extends AbstractVisitor implements DeserializationVisitorInterface
@@ -108,27 +108,27 @@ final class JsonDeserializationVisitor extends AbstractVisitor implements Deseri
         $this->setCurrentObject($object);
     }
 
-    public function visitProperty(PropertyMetadata $metadata, $data)
+    public function visitProperty(PropertyMetadataInterface $metadata, $data)
     {
-        $name = $metadata->serializedName;
+        $name = $metadata->getSerializedName();
 
         if (null === $data) {
             return;
         }
 
         if (!\is_array($data)) {
-            throw new RuntimeException(sprintf('Invalid data %s (%s), expected "%s".', json_encode($data), $metadata->type['name'], $metadata->class));
+            throw new RuntimeException(sprintf('Invalid data %s (%s), expected "%s".', json_encode($data), $metadata->getType()['name'], $metadata->getClass()));
         }
 
         if (!array_key_exists($name, $data)) {
             return;
         }
 
-        if (!$metadata->type) {
-            throw new RuntimeException(sprintf('You must define a type for %s::$%s.', $metadata->class, $metadata->name));
+        if (!$metadata->getType()) {
+            throw new RuntimeException(sprintf('You must define a type for %s::$%s.', $metadata->getClass(), $metadata->getName()));
         }
 
-        $v = $data[$name] !== null ? $this->navigator->accept($data[$name], $metadata->type) : null;
+        $v = $data[$name] !== null ? $this->navigator->accept($data[$name], $metadata->getType()) : null;
 
         return $v;
     }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace JMS\Serializer\Metadata\Driver;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata as DoctrineClassMetadata;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 /**
  * This class decorates any other driver. If the inner driver does not provide a
@@ -15,18 +15,18 @@ class DoctrinePHPCRTypeDriver extends AbstractDoctrineTypeDriver
 {
     /**
      * @param DoctrineClassMetadata $doctrineMetadata
-     * @param PropertyMetadata $propertyMetadata
+     * @param PropertyMetadataInterface $propertyMetadata
      */
-    protected function hideProperty(DoctrineClassMetadata $doctrineMetadata, PropertyMetadata $propertyMetadata):bool
+    protected function hideProperty(DoctrineClassMetadata $doctrineMetadata, PropertyMetadataInterface $propertyMetadata):bool
     {
         return 'lazyPropertiesDefaults' === $propertyMetadata->name
             || $doctrineMetadata->parentMapping === $propertyMetadata->name
             || $doctrineMetadata->node === $propertyMetadata->name;
     }
 
-    protected function setPropertyType(DoctrineClassMetadata $doctrineMetadata, PropertyMetadata $propertyMetadata):void
+    protected function setPropertyType(DoctrineClassMetadata $doctrineMetadata, PropertyMetadataInterface $propertyMetadata):void
     {
-        $propertyName = $propertyMetadata->name;
+        $propertyName = $propertyMetadata->getName();
         if ($doctrineMetadata->hasField($propertyName) && $fieldType = $this->normalizeFieldType($doctrineMetadata->getTypeOfField($propertyName))) {
             $field = $doctrineMetadata->getFieldMapping($propertyName);
             if (!empty($field['multivalue'])) {

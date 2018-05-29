@@ -12,7 +12,7 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\Exclusion\GroupsExclusionStrategy;
 use JMS\Serializer\Exclusion\VersionExclusionStrategy;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use Metadata\MetadataFactory;
 use Metadata\MetadataFactoryInterface;
 
@@ -198,7 +198,7 @@ abstract class Context
         $this->metadataStack->push($metadata);
     }
 
-    public function pushPropertyMetadata(PropertyMetadata $metadata): void
+    public function pushPropertyMetadata(PropertyMetadataInterface $metadata): void
     {
         $this->metadataStack->push($metadata);
     }
@@ -207,7 +207,7 @@ abstract class Context
     {
         $metadata = $this->metadataStack->pop();
 
-        if (!$metadata instanceof PropertyMetadata) {
+        if (!$metadata instanceof PropertyMetadataInterface) {
             throw new RuntimeException('Context metadataStack not working well');
         }
     }
@@ -237,8 +237,8 @@ abstract class Context
 
         $paths = [];
         foreach ($this->metadataStack as $metadata) {
-            if ($metadata instanceof PropertyMetadata) {
-                array_unshift($paths, $metadata->name);
+            if ($metadata instanceof PropertyMetadataInterface) {
+                array_unshift($paths, $metadata->getName());
             }
         }
 

@@ -38,8 +38,11 @@ use JMS\Serializer\Annotation\XmlValue;
 use JMS\Serializer\Exception\InvalidMetadataException;
 use JMS\Serializer\Metadata\ClassMetadata;
 use JMS\Serializer\Metadata\ExpressionPropertyMetadata;
+use JMS\Serializer\Metadata\ExpressionPropertyMetadataInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Metadata\VirtualPropertyMetadata;
+use JMS\Serializer\Metadata\VirtualPropertyMetadataInterface;
 use JMS\Serializer\Naming\PropertyNamingStrategyInterface;
 use JMS\Serializer\Type\Parser;
 use JMS\Serializer\Type\ParserInterface;
@@ -72,7 +75,7 @@ class AnnotationDriver implements DriverInterface
 
         $exclusionPolicy = 'NONE';
         $excludeAll = false;
-        $classAccessType = PropertyMetadata::ACCESS_TYPE_PROPERTY;
+        $classAccessType = PropertyMetadataInterface::ACCESS_TYPE_PROPERTY;
         $readOnlyClass = false;
         foreach ($this->reader->getClassAnnotations($class) as $annot) {
             if ($annot instanceof ExclusionPolicy) {
@@ -145,9 +148,9 @@ class AnnotationDriver implements DriverInterface
 
             foreach ($propertiesMetadata as $propertyKey => $propertyMetadata) {
                 $isExclude = false;
-                $isExpose = $propertyMetadata instanceof VirtualPropertyMetadata
-                    || $propertyMetadata instanceof ExpressionPropertyMetadata;
-                $propertyMetadata->readOnly = $propertyMetadata->readOnly || $readOnlyClass;
+                $isExpose = $propertyMetadata instanceof VirtualPropertyMetadataInterface
+                    || $propertyMetadata instanceof ExpressionPropertyMetadataInterface;
+                $propertyMetadata->readOnly = $propertyMetadata->isReadOnly() || $readOnlyClass;
                 $accessType = $classAccessType;
                 $accessor = [null, null];
 
@@ -209,12 +212,12 @@ class AnnotationDriver implements DriverInterface
                         $accessor = [$annot->getter, $annot->setter];
                     } elseif ($annot instanceof Groups) {
                         $propertyMetadata->groups = $annot->groups;
-                        foreach ((array)$propertyMetadata->groups as $groupName) {
+                        foreach ((array)$propertyMetadata->getGroups() as $groupName) {
                             if (false !== strpos($groupName, ',')) {
                                 throw new InvalidMetadataException(sprintf(
                                     'Invalid group name "%s" on "%s", did you mean to create multiple groups?',
-                                    implode(', ', $propertyMetadata->groups),
-                                    $propertyMetadata->class . '->' . $propertyMetadata->name
+                                    implode(', ', $propertyMetadata->getGroups()),
+                                    $propertyMetadata->getClass() . '->' . $propertyMetadata->getName()
                                 ));
                             }
                         }
@@ -227,16 +230,16 @@ class AnnotationDriver implements DriverInterface
                     }
                 }
 
-                if ($propertyMetadata->inline) {
-                    $classMetadata->isList = $classMetadata->isList() || PropertyMetadata::isCollectionList($propertyMetadata->type);
-                    $classMetadata->isMap = $classMetadata->isMap() || PropertyMetadata::isCollectionMap($propertyMetadata->type);
+                if ($propertyMetadata->isInline()) {
+                    $classMetadata->isList = $classMetadata->isList() || PropertyMetadata::isCollectionList($propertyMetadata->getType());
+                    $classMetadata->isMap = $classMetadata->isMap() || PropertyMetadata::isCollectionMap($propertyMetadata->getType());
 
                     if ($classMetadata->isMap() && $classMetadata->isList()) {
                         throw new InvalidMetadataException("Can not have an inline map and and inline map on the same class");
                     }
                 }
 
-                if (!$propertyMetadata->serializedName) {
+                if (!$propertyMetadata->getSerializedName()) {
                     $propertyMetadata->serializedName = $this->namingStrategy->translateName($propertyMetadata);
                 }
 

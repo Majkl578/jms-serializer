@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Accessor;
 
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 /**
  * @author Asmir Mustafic <goetas@gmail.com>
@@ -13,16 +13,16 @@ interface AccessorStrategyInterface
 {
     /**
      * @param object $object
-     * @param PropertyMetadata $metadata
+     * @param PropertyMetadataInterface $metadata
      * @return mixed
      */
-    public function getValue(object $object, PropertyMetadata $metadata);
+    public function getValue(object $object, PropertyMetadataInterface $metadata);
 
     /**
      * @param object $object
      * @param mixed $value
-     * @param PropertyMetadata $metadata
+     * @param PropertyMetadataInterface $metadata
      * @return void
      */
-    public function setValue(object $object, $value, PropertyMetadata $metadata): void;
+    public function setValue(object $object, $value, PropertyMetadataInterface $metadata): void;
 }

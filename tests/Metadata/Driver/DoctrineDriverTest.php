@@ -29,7 +29,7 @@ class DoctrineDriverTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             ['name' => 'DateTime', 'params' => []],
-            $metadata->getProperties()['createdAt']->type
+            $metadata->getProperties()['createdAt']->getType()
         );
     }
 
@@ -38,7 +38,7 @@ class DoctrineDriverTest extends \PHPUnit\Framework\TestCase
         $metadata = $this->getMetadata();
         self::assertEquals(
             ['name' => 'JMS\Serializer\Tests\Fixtures\Doctrine\Author', 'params' => []],
-            $metadata->getProperties()['author']->type
+            $metadata->getProperties()['author']->getType()
         );
     }
 
@@ -50,7 +50,7 @@ class DoctrineDriverTest extends \PHPUnit\Framework\TestCase
             ['name' => 'ArrayCollection', 'params' => [
                 ['name' => 'JMS\Serializer\Tests\Fixtures\Doctrine\Comment', 'params' => []]]
             ],
-            $metadata->getProperties()['comments']->type
+            $metadata->getProperties()['comments']->getType()
         );
     }
 
@@ -61,14 +61,14 @@ class DoctrineDriverTest extends \PHPUnit\Framework\TestCase
         // This would be guessed as boolean but we've overriden it to integer
         self::assertEquals(
             ['name' => 'integer', 'params' => []],
-            $metadata->getProperties()['published']->type
+            $metadata->getProperties()['published']->getType()
         );
     }
 
     public function testUnknownDoctrineTypeDoesNotResultInAGuess()
     {
         $metadata = $this->getMetadata();
-        self::assertNull($metadata->getProperties()['slug']->type);
+        self::assertNull($metadata->getProperties()['slug']->getType());
     }
 
     public function testNonDoctrineEntityClassIsNotModified()
@@ -101,7 +101,7 @@ class DoctrineDriverTest extends \PHPUnit\Framework\TestCase
     public function testVirtualPropertiesAreNotModified()
     {
         $doctrineMetadata = $this->getMetadata();
-        self::assertNull($doctrineMetadata->getProperties()['ref']->type);
+        self::assertNull($doctrineMetadata->getProperties()['ref']->getType());
     }
 
     public function testGuidPropertyIsGivenStringType()
@@ -110,7 +110,7 @@ class DoctrineDriverTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             ['name' => 'string', 'params' => []],
-            $metadata->getProperties()['id']->type
+            $metadata->getProperties()['id']->getType()
         );
     }
 

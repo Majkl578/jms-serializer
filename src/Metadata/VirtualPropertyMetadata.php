@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Metadata;
 
-class VirtualPropertyMetadata extends PropertyMetadata
+class VirtualPropertyMetadata extends PropertyMetadata implements VirtualPropertyMetadataInterface
 {
     public function __construct(string $class, string $methodName)
     {

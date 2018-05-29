@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Naming;
 
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 /**
  * Interface for property naming strategies.
@@ -19,9 +19,9 @@ interface PropertyNamingStrategyInterface
     /**
      * Translates the name of the property to the serialized version.
      *
-     * @param PropertyMetadata $property
+     * @param PropertyMetadataInterface $property
      *
      * @return string
      */
-    public function translateName(PropertyMetadata $property): string;
+    public function translateName(PropertyMetadataInterface $property): string;
 }

@@ -6,7 +6,7 @@ namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 final class VersionExclusionStrategy implements ExclusionStrategyInterface
 {
@@ -28,13 +28,13 @@ final class VersionExclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
+    public function shouldSkipProperty(PropertyMetadataInterface $property, Context $navigatorContext): bool
     {
-        if ((null !== $version = $property->sinceVersion) && version_compare($this->version, $version, '<')) {
+        if ((null !== $version = $property->getSinceVersion()) && version_compare($this->version, $version, '<')) {
             return true;
         }
 
-        if ((null !== $version = $property->untilVersion) && version_compare($this->version, $version, '>')) {
+        if ((null !== $version = $property->getUntilVersion()) && version_compare($this->version, $version, '>')) {
             return true;
         }
 

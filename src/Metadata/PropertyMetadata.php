@@ -7,11 +7,8 @@ namespace JMS\Serializer\Metadata;
 use JMS\Serializer\Exception\InvalidMetadataException;
 use Metadata\PropertyMetadata as BasePropertyMetadata;
 
-class PropertyMetadata extends BasePropertyMetadata
+class PropertyMetadata extends BasePropertyMetadata implements PropertyMetadataInterface
 {
-    const ACCESS_TYPE_PROPERTY = 'property';
-    const ACCESS_TYPE_PUBLIC_METHOD = 'public_method';
-
     public $sinceVersion;
     public $untilVersion;
     public $groups;
@@ -40,6 +37,136 @@ class PropertyMetadata extends BasePropertyMetadata
     public function __construct(string $class, string $name)
     {
         parent::__construct($class, $name);
+    }
+
+    public function getClass() : string
+    {
+        return $this->class;
+    }
+
+    public function getName() : string
+    {
+        return $this->name;
+    }
+
+    public function getSinceVersion() : ?string
+    {
+        return $this->sinceVersion;
+    }
+
+    public function getUntilVersion() : ?string
+    {
+        return $this->untilVersion;
+    }
+
+    public function getGroups() : ?array
+    {
+        return $this->groups;
+    }
+
+    public function getSerializedName() : ?string
+    {
+        return $this->serializedName;
+    }
+
+    public function getType() : ?array
+    {
+        return $this->type;
+    }
+
+    public function isXmlCollection() : bool
+    {
+        return $this->xmlCollection;
+    }
+
+    public function isXmlCollectionInline() : bool
+    {
+        return $this->xmlCollectionInline;
+    }
+
+    public function isXmlCollectionSkippedWhenEmpty() : bool
+    {
+        return $this->xmlCollectionSkipWhenEmpty;
+    }
+
+    public function getXmlEntryName() : ?string
+    {
+        return $this->xmlEntryName;
+    }
+
+    public function getXmlEntryNamespace() : ?string
+    {
+        return $this->xmlEntryNamespace;
+    }
+
+    public function getXmlKeyAttribute() : ?string
+    {
+        return $this->xmlKeyAttribute;
+    }
+
+    public function isXmlAttribute() : bool
+    {
+        return $this->xmlAttribute;
+    }
+
+    public function isXmlValue() : bool
+    {
+        return $this->xmlValue;
+    }
+
+    public function getXmlNamespace() : ?string
+    {
+        return $this->xmlNamespace;
+    }
+
+    public function isXmlKeyValuePairs() : bool
+    {
+        return $this->xmlKeyValuePairs;
+    }
+
+    public function isXmlElementCData() : bool
+    {
+        return $this->xmlElementCData;
+    }
+
+    public function getGetter() : ?string
+    {
+        return $this->getter;
+    }
+
+    public function getSetter() : ?string
+    {
+        return $this->setter;
+    }
+
+    public function isInline() : bool
+    {
+        return $this->inline;
+    }
+
+    public function isSkippedWhenEmpty() : bool
+    {
+        return $this->skipWhenEmpty;
+    }
+
+    public function isReadOnly() : bool
+    {
+        return $this->readOnly;
+    }
+
+    public function isXmlAttributeMap() : bool
+    {
+        return $this->xmlAttributeMap;
+    }
+
+    public function getMaxDepth() : ?int
+    {
+        return $this->maxDepth;
+    }
+
+    public function getExcludeIf() : ?string
+    {
+        return $this->excludeIf;
     }
 
     private function getReflection(): \ReflectionProperty

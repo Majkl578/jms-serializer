@@ -6,7 +6,7 @@ namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
 use JMS\Serializer\Expression\ExpressionEvaluatorInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\SerializationContext;
 
 /**
@@ -32,9 +32,9 @@ final class ExpressionLanguageExclusionStrategy
     /**
      * {@inheritDoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
+    public function shouldSkipProperty(PropertyMetadataInterface $property, Context $navigatorContext): bool
     {
-        if (null === $property->excludeIf) {
+        if (null === $property->getExcludeIf()) {
             return false;
         }
 
@@ -48,6 +48,6 @@ final class ExpressionLanguageExclusionStrategy
             $variables['object'] = null;
         }
 
-        return $this->expressionEvaluator->evaluate($property->excludeIf, $variables);
+        return $this->expressionEvaluator->evaluate($property->getExcludeIf(), $variables);
     }
 }

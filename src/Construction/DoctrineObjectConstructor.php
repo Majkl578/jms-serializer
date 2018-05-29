@@ -75,7 +75,7 @@ final class DoctrineObjectConstructor implements ObjectConstructorInterface
         foreach ($classMetadata->getIdentifierFieldNames() as $name) {
 
             if (isset($metadata->getProperties()[$name])) {
-                $dataName = $metadata->getProperties()[$name]->serializedName;
+                $dataName = $metadata->getProperties()[$name]->getSerializedName();
             } else {
                 $dataName = $name;
             }

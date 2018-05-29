@@ -6,7 +6,7 @@ namespace JMS\Serializer\Exclusion;
 
 use JMS\Serializer\Context;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 /**
  * Disjunct Exclusion Strategy.
@@ -54,11 +54,11 @@ final class DisjunctExclusionStrategy implements ExclusionStrategyInterface
     /**
      * Whether the property should be skipped.
      *
-     * @param PropertyMetadata $property
+     * @param PropertyMetadataInterface $property
      *
      * @return boolean
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $context): bool
+    public function shouldSkipProperty(PropertyMetadataInterface $property, Context $context): bool
     {
         foreach ($this->delegates as $delegate) {
             /** @var $delegate ExclusionStrategyInterface */

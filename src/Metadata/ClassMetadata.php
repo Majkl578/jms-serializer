@@ -93,7 +93,7 @@ class ClassMetadata extends MergeableClassMetadata implements ClassMetadataInter
     }
 
     /**
-     * @return PropertyMetadata[]
+     * @return PropertyMetadataInterface[]
      */
     public function getProperties() : array
     {
@@ -277,7 +277,7 @@ class ClassMetadata extends MergeableClassMetadata implements ClassMetadataInter
     {
         parent::addPropertyMetadata($metadata);
         $this->sortProperties();
-        if ($metadata instanceof PropertyMetadata && $metadata->excludeIf) {
+        if ($metadata instanceof PropertyMetadataInterface && $metadata->getExcludeIf()) {
             $this->usingExpression = true;
         }
     }
@@ -350,7 +350,7 @@ class ClassMetadata extends MergeableClassMetadata implements ClassMetadataInter
             $this->discriminatorValue = $typeValue;
 
             if (isset($this->propertyMetadata[$this->discriminatorFieldName])
-                && !$this->propertyMetadata[$this->discriminatorFieldName] instanceof StaticPropertyMetadata
+                && !$this->propertyMetadata[$this->discriminatorFieldName] instanceof StaticPropertyMetadataInterface
             ) {
                 throw new InvalidMetadataException(sprintf(
                     'The discriminator field name "%s" of the base-class "%s" conflicts with a regular property of the sub-class "%s".',

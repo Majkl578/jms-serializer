@@ -10,7 +10,7 @@ use JMS\Serializer\Exception\NotAcceptableException;
 use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Exception\XmlErrorException;
 use JMS\Serializer\Metadata\ClassMetadataInterface;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 use JMS\Serializer\Visitor\DeserializationVisitorInterface;
 
 final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwareVisitorInterface, DeserializationVisitorInterface
@@ -19,6 +19,8 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
     private $metadataStack;
     private $objectMetadataStack;
     private $currentObject;
+
+    /** @var PropertyMetadataInterface */
     private $currentMetadata;
     private $disableExternalEntities = true;
     private $doctypeWhitelist = [];
@@ -105,7 +107,7 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
     public function visitArray($data, array $type): array
     {
         // handle key-value-pairs
-        if (null !== $this->currentMetadata && $this->currentMetadata->xmlKeyValuePairs) {
+        if (null !== $this->currentMetadata && $this->currentMetadata->isXmlKeyValuePairs()) {
             if (2 !== count($type['params'])) {
                 throw new RuntimeException('The array type must be specified as "array<K,V>" for Key-Value-Pairs.');
             }
@@ -122,8 +124,8 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
             return $result;
         }
 
-        $entryName = null !== $this->currentMetadata && $this->currentMetadata->xmlEntryName ? $this->currentMetadata->xmlEntryName : 'entry';
-        $namespace = null !== $this->currentMetadata && $this->currentMetadata->xmlEntryNamespace ? $this->currentMetadata->xmlEntryNamespace : null;
+        $entryName = null !== $this->currentMetadata && $this->currentMetadata->getXmlEntryName() ? $this->currentMetadata->getXmlEntryName() : 'entry';
+        $namespace = null !== $this->currentMetadata && $this->currentMetadata->getXmlEntryNamespace() ? $this->currentMetadata->getXmlEntryNamespace() : null;
 
         if ($namespace === null && $this->objectMetadataStack->count()) {
             $classMetadata = $this->objectMetadataStack->top();
@@ -172,11 +174,11 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
                 $nodes = $data->children($namespace)->$entryName;
                 foreach ($nodes as $v) {
                     $attrs = $v->attributes();
-                    if (!isset($attrs[$this->currentMetadata->xmlKeyAttribute])) {
-                        throw new RuntimeException(sprintf('The key attribute "%s" must be set for each entry of the map.', $this->currentMetadata->xmlKeyAttribute));
+                    if (!isset($attrs[$this->currentMetadata->getXmlKeyAttribute()])) {
+                        throw new RuntimeException(sprintf('The key attribute "%s" must be set for each entry of the map.', $this->currentMetadata->getXmlKeyAttribute()));
                     }
 
-                    $k = $this->navigator->accept($attrs[$this->currentMetadata->xmlKeyAttribute], $keyType);
+                    $k = $this->navigator->accept($attrs[$this->currentMetadata->getXmlKeyAttribute()], $keyType);
                     $result[$k] = $this->navigator->accept($v, $entryType);
                 }
 
@@ -220,42 +222,42 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
         $this->objectMetadataStack->push($metadata);
     }
 
-    public function visitProperty(PropertyMetadata $metadata, $data)
+    public function visitProperty(PropertyMetadataInterface $metadata, $data)
     {
-        $name = $metadata->serializedName;
+        $name = $metadata->getSerializedName();
 
-        if (!$metadata->type) {
-            throw new RuntimeException(sprintf('You must define a type for %s::$%s.', $metadata->reflection->class, $metadata->name));
+        if (!$metadata->getType()) {
+            throw new RuntimeException(sprintf('You must define a type for %s::$%s.', $metadata->reflection->class, $metadata->getName()));
         }
 
-        if ($metadata->xmlAttribute) {
+        if ($metadata->isXmlAttribute()) {
 
-            $attributes = $data->attributes($metadata->xmlNamespace);
+            $attributes = $data->attributes($metadata->getXmlNamespace());
             if (isset($attributes[$name])) {
-                return $this->navigator->accept($attributes[$name], $metadata->type);
+                return $this->navigator->accept($attributes[$name], $metadata->getType());
             }
 
             throw new NotAcceptableException();
         }
 
-        if ($metadata->xmlValue) {
-            return $this->navigator->accept($data, $metadata->type);
+        if ($metadata->isXmlValue()) {
+            return $this->navigator->accept($data, $metadata->getType());
         }
 
-        if ($metadata->xmlCollection) {
+        if ($metadata->isXmlCollection()) {
             $enclosingElem = $data;
-            if (!$metadata->xmlCollectionInline) {
-                $enclosingElem = $data->children($metadata->xmlNamespace)->$name;
+            if (!$metadata->isXmlCollectionInline()) {
+                $enclosingElem = $data->children($metadata->getXmlNamespace())->$name;
             }
 
             $this->setCurrentMetadata($metadata);
-            $v = $this->navigator->accept($enclosingElem, $metadata->type);
+            $v = $this->navigator->accept($enclosingElem, $metadata->getType());
             $this->revertCurrentMetadata();
             return $v;
         }
 
-        if ($metadata->xmlNamespace) {
-            $node = $data->children($metadata->xmlNamespace)->$name;
+        if ($metadata->getXmlNamespace()) {
+            $node = $data->children($metadata->getXmlNamespace())->$name;
             if (!$node->count()) {
                 throw new NotAcceptableException();
             }
@@ -276,11 +278,11 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
             $node = reset($nodes);
         }
 
-        if ($metadata->xmlKeyValuePairs) {
+        if ($metadata->isXmlKeyValuePairs()) {
             $this->setCurrentMetadata($metadata);
         }
 
-        return $this->navigator->accept($node, $metadata->type);
+        return $this->navigator->accept($node, $metadata->getType());
     }
 
     /**
@@ -315,7 +317,7 @@ final class XmlDeserializationVisitor extends AbstractVisitor implements NullAwa
         return $this->currentObject = $this->objectStack->pop();
     }
 
-    public function setCurrentMetadata(PropertyMetadata $metadata)
+    public function setCurrentMetadata(PropertyMetadataInterface $metadata)
     {
         $this->metadataStack->push($this->currentMetadata);
         $this->currentMetadata = $metadata;

@@ -13,7 +13,7 @@ use JMS\Serializer\Exception\LogicException;
  *
  * @author Asmir Mustafic <goetas@gmail.com>
  */
-class ExpressionPropertyMetadata extends PropertyMetadata
+class ExpressionPropertyMetadata extends PropertyMetadata implements ExpressionPropertyMetadataInterface
 {
     /**
      * @var string
@@ -30,6 +30,11 @@ class ExpressionPropertyMetadata extends PropertyMetadata
 
     public function setAccessor(string $type, ?string $getter = null, ?string $setter = null):void
     {
+    }
+
+    public function getExpression() : string
+    {
+        return $this->expression;
     }
 
     public function serialize()

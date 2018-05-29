@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace JMS\Serializer\Ordering;
 
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Metadata\PropertyMetadataInterface;
 
 interface PropertyOrderingInterface
 {
     /**
-     * @param PropertyMetadata[] $properties name => property
-     * @return PropertyMetadata[] name => property
+     * @param PropertyMetadataInterface[] $properties name => property
+     * @return PropertyMetadataInterface[] name => property
      */
     public function order(array $properties) : array;
 }
